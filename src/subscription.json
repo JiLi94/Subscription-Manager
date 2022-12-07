@@ -1,1 +1,14 @@
-{"Category": "Entertainment", "Name": "Netflix", "Frequency": "Monthly", "Charge": 11.99}
+{
+    "Entertainment": [
+        {
+            "Name": "Netlflix",
+            "Frequency": "Daily",
+            "Charge": 12.0
+        },
+        {
+            "Name": "Netfilx",
+            "Frequency": "Monthly",
+            "Charge": 12.0
+        }
+    ]
+}
