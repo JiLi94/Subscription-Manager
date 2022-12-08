@@ -1,4 +1,4 @@
-from json_handling import print_json, write_json
+from json_handling import write_json
 from terminal_menu import Menu
 import json
 
@@ -18,24 +18,38 @@ class Subscription():
 
             # prompt a terminal menu to ask for user to select a category
             category_menu = Menu(category_option)
-            print('Please select a category:')
+            print('To view current subscriptions, please select a category:')
             category_selected = category_menu.print_menu()
             print(category_selected)
 
             # print the subscriptions
             if category_selected == 'View All':
-                print(json.dumps(file_data, indent=2))
+                print(json.dumps(file_data, indent=4))
             else:
                 print(json.dumps(file_data[category_selected], indent=2))
 
     def add_subscription(self):
-        # ask for category
-        category_option = ["Entertainment",
-                           "Productivity", "Utility", "Add New Category"]
+        category_option = ['Entertainment', 'Productivity', 'Utility']
+
+        with open(self.filename, 'r') as file:
+            file_data = json.load(file)
+            # get the categories of existing subscriptions
+            for option in list(file_data.keys()):
+                if option not in category_option:
+                    category_option.append(option)
+
+            category_option.append('Add New Category')
+
         category_menu = Menu(category_option)
-        print('Please select a category of the subscription: ')
+        print('To add new subscription, please select a category of the subscription: ')
         category_selected = category_menu.print_menu()
-        print(category_selected)
+
+        # if user would like to add new category, ask for new category name
+        if category_selected == 'Add New Category':
+            category_selected = input(
+                'Please enter the name of the new category: ')
+        else:
+            print(category_selected)
 
         # ask for name of the subscription
         name = input('Please enter the name of the subscription: ')
