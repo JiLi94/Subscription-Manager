@@ -1,1 +1,19 @@
-{"Entertainment": [{"Name": "Netlflix", "Frequency": "Daily", "Charge": 12.0}, {"Name": "Netfilx", "Frequency": "Monthly", "Charge": 12.0}, {"Name": "Phone", "Frequency": "Quarterly", "Charge": 15.0}], "Utility": {"Name": "Phone", "Frequency": "Daily", "Charge": 40.0}}
+{
+    "Entertainment": [
+        {
+            "Name": "Netlflix",
+            "Frequency": "Daily",
+            "Charge": 12.0
+        },
+        {
+            "Name": "Netfilx",
+            "Frequency": "Monthly",
+            "Charge": 12.0
+        }
+    ],
+    "Utility": {
+        "Name": "Phone",
+        "Frequency": "Daily",
+        "Charge": 40.0
+    }
+}

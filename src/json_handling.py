@@ -7,7 +7,7 @@ def print_json(filename='./src/subscription.json'):
         print(json.dumps(file_data, indent=2)) #pretty print JSON
 
 
-def write_json(category, subscription_detail, filename='./src/subscription.json'):
+def write_json(category, subscription_detail, filename):
     with open(filename, 'r') as file:
         file_data = json.load(file)
 

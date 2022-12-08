@@ -1,5 +1,6 @@
 from json_handling import print_json, write_json
 from terminal_menu import Menu
+import json
 
 
 class Subscription():
@@ -8,7 +9,24 @@ class Subscription():
         self.filename = filename
 
     def view_subscription(self):
-        print_json()
+        with open(self.filename, 'r') as file:
+            file_data = json.load(file)
+
+            # get the categories of existing subscriptions
+            category_option = list(file_data.keys())
+            category_option.insert(0, 'View All')
+
+            # prompt a terminal menu to ask for user to select a category
+            category_menu = Menu(category_option)
+            print('Please select a category:')
+            category_selected = category_menu.print_menu()
+            print(category_selected)
+
+            # print the subscriptions
+            if category_selected == 'View All':
+                print(json.dumps(file_data, indent=2))
+            else:
+                print(json.dumps(file_data[category_selected], indent=2))
 
     def add_subscription(self):
         # ask for category
@@ -48,9 +66,9 @@ class Subscription():
         }
 
         # add new subscription to the list using the function write_json
-        write_json(category_selected, new_subscription)
+        write_json(category_selected, new_subscription, self.filename)
 
 
 new_sub = Subscription()
-new_sub.add_subscription()
+# new_sub.add_subscription()
 new_sub.view_subscription()
