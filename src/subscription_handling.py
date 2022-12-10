@@ -7,6 +7,15 @@ class Subscription():
 
     def __init__(self, filepath='./src/subscription.json'):
         self.filepath = filepath
+        self.frequency_option = ["Daily", "Monthly", "Quarterly", "Annual"]
+        self.default_category = ['Entertainment', 'Productivity', 'Utility']
+
+    def is_empty(self):
+        file_data = read_json(self.filepath)
+        if file_data == {}:
+            return True
+        else:
+            return False
 
     def category_list(self, mode):
         file_data = read_json(self.filepath)
@@ -18,9 +27,9 @@ class Subscription():
             category_list.insert(0, 'View All')
         # when add subscriptions, show all existing categories and anything left in the default category
         elif mode == 'add':
-            default_category = ['Entertainment', 'Productivity', 'Utility']
+
             category_list = list(
-                set(category_list).union(set(default_category)))
+                set(category_list).union(set(self.default_category)))
             category_list.append('Add New Category')
         elif mode == 'update':
             pass
@@ -62,7 +71,7 @@ class Subscription():
         category_selected = self.select_category(mode='view')
 
         # print the subscriptions
-        if file_data == {}:
+        if self.is_empty():
             print('You don\'t have any existing subscriptions')
         elif category_selected == 'View All':
             print(json.dumps(file_data, indent=4))
@@ -88,9 +97,8 @@ class Subscription():
 
     def select_frequency(self):
         # ask for frequency of the subscription
-        frequency_option = ["Daily", "Monthly", "Quarterly", "Annual"]
         prompt = 'Please select the frequency of subscription:'
-        frequency_selected = terminal_menu(frequency_option, prompt)
+        frequency_selected = terminal_menu(self.frequency_option, prompt)
         return frequency_selected
 
     def input_charge(self):
@@ -125,53 +133,67 @@ class Subscription():
         # add new subscription to the list using the function write_json
         write_json(category_selected, new_subscription, self.filepath)
 
-    def delete_subscription(self, mode = 'delete'):
-        # ask user to select a category first
-        category_selected = self.select_category(mode='update')
-        # ask user to select a subscription
-        subscription_selected = self.select_subscription(category_selected)
-        # delete the selected subscription
-        # if user selects to delete, add a confirmation before deleting
-        if mode == 'delete':
-            confirmation = input(f'Are you sure to delete {subscription_selected}? Input Yes/No to confirm: ')
-            while True:
-                if confirmation.lower() == 'yes':
-                    delete_json(category_selected, subscription_selected, self.filepath)
-                    print('Deleted successfully!')
-                    break
-                elif confirmation.lower() == 'no':
-                    break
-                else:
-                    confirmation = input('Please enter "Yes" or "No" to confirm: ')
-        # if mode is not 'delete', no confirmation needed, because it will be added back later with updated info
+    def delete_subscription(self, mode='delete'):
+        if self.is_empty():
+            print('You don\'t have any existing subscriptions')
         else:
-            delete_json(category_selected, subscription_selected, self.filepath)
+            # ask user to select a category first
+            category_selected = self.select_category(mode='update')
+            # ask user to select a subscription
+            subscription_selected = self.select_subscription(category_selected)
+            # delete the selected subscription
+            # if user selects to delete, add a confirmation before deleting
+            if mode == 'delete':
+                confirmation = input(
+                    f'Are you sure to delete {subscription_selected}? Input Yes/No to confirm: ')
+                while True:
+                    if confirmation.lower() == 'yes':
+                        delete_json(category_selected,
+                                    subscription_selected, self.filepath)
+                        print('Deleted successfully!')
+                        break
+                    elif confirmation.lower() == 'no':
+                        break
+                    else:
+                        confirmation = input(
+                            'Please enter "Yes" or "No" to confirm: ')
+            # if mode is not 'delete', no confirmation needed, because it will be added back later with updated info
+            else:
+                delete_json(category_selected,
+                            subscription_selected, self.filepath)
 
-        return [category_selected, subscription_selected]
+            return [category_selected, subscription_selected]
 
     def update_subscription(self):
-        # delete the selected subscription first, then can add back the updated one
-        selected = self.delete_subscription(mode = 'update')
+        if self.is_empty():
+            print('You don\'t have any existing subscriptions')
+        else:
+            # delete the selected subscription first, then can add back the updated one
+            selected = self.delete_subscription(mode='update')
 
-        prompt = 'Please select the attribute you would like to update:'
-        # turn the dict into a list so it can be passed into the terminal_menu function
-        option_list = ['Category'+ ': ' + selected[0]]
-        for key, value in selected[1].items():
-            option_list.append(str(key) + ': ' + str(value))
+            prompt = 'Please select the attribute you would like to update:'
+            # turn the dict into a list so it can be passed into the terminal_menu function
+            option_list = ['Category' + ': ' + selected[0]]
+            for key, value in selected[1].items():
+                option_list.append(str(key) + ': ' + str(value))
 
-        selected_attribute = terminal_menu(option_list, prompt)
+            selected_attribute = terminal_menu(option_list, prompt)
 
-        # update the subscription based on user's selection
-        if 'Category: ' in selected_attribute:
-            selected[0] = self.select_category(mode = 'add')
-        if 'Name: ' in selected_attribute:
-            selected[1]['Name'] = self.input_name()
-        if 'Frequency: ' in selected_attribute:
-            selected[1]['Frequency'] = self.select_frequency()
-        if 'Charge: ' in selected_attribute:
-            selected[1]['Charge'] = self.input_charge()
-        # write the updated subscription into database
-        write_json(selected[0], selected[1], self.filepath)
+            # update the subscription based on user's selection
+            if 'Category: ' in selected_attribute:
+                selected[0] = self.select_category(mode='add')
+            if 'Name: ' in selected_attribute:
+                selected[1]['Name'] = self.input_name()
+            if 'Frequency: ' in selected_attribute:
+                selected[1]['Frequency'] = self.select_frequency()
+            if 'Charge: ' in selected_attribute:
+                selected[1]['Charge'] = self.input_charge()
+            # write the updated subscription into database
+            write_json(selected[0], selected[1], self.filepath)
+
+    def cost(self):
+        pass
+
 
 new_sub = Subscription()
 # new_sub.input_name()
@@ -179,6 +201,7 @@ new_sub = Subscription()
 # new_sub.add_subscription()
 # new_sub.view_subscription()
 
-# new_sub.update_subscription()
+new_sub.update_subscription()
 # new_sub.select_subscription('Utility')
-new_sub.delete_subscription()
+# new_sub.delete_subscription()
+# print(new_sub.is_empty())
