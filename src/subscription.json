@@ -1,1 +1,28 @@
-{}
+{
+    "Entertainment": [
+        {
+            "Name": "Netflifx",
+            "Frequency": "Monthly",
+            "Charge": 30.0
+        },
+        {
+            "Name": "Amazon",
+            "Frequency": "Monthly",
+            "Charge": 12.0
+        }
+    ],
+    "Productivity": [
+        {
+            "Name": "Office",
+            "Frequency": "Annual",
+            "Charge": 300.0
+        }
+    ],
+    "Utility": [
+        {
+            "Name": "Phone",
+            "Frequency": "Daily",
+            "Charge": 1.0
+        }
+    ]
+}

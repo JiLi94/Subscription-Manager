@@ -91,13 +91,13 @@ class Subscription():
         # avoid duplicates
         while name.lower() in [sub.lower() for sub in existing_subscription]:
             name = input(
-                'Name exists! Please enter a different name: ')
+                'Subscription exists! Please enter a different name: ')
 
         return name
 
     def select_frequency(self):
         # ask for frequency of the subscription
-        prompt = 'Please select the frequency of subscription:'
+        prompt = 'Please select the frequency:'
         frequency_selected = terminal_menu(self.frequency_option, prompt)
         return frequency_selected
 
@@ -192,7 +192,44 @@ class Subscription():
             write_json(selected[0], selected[1], self.filepath)
 
     def cost(self):
-        pass
+        frequency_selected = self.select_frequency()
+
+        file_data = read_json(self.filepath)
+        # calculate total cost of each frequency
+        cost_dict = {}
+        for frequency in self.frequency_option:
+            cost = 0
+            for category in file_data:
+                for sub in file_data[category]:
+                    # print(sub)
+                    if sub['Frequency'] == frequency:
+                        cost += sub['Charge']
+            cost_dict[frequency] = cost
+
+        print(cost_dict)
+        # calculate the estimated cost for each frequency
+        cost_daily = cost_dict['Daily'] + cost_dict['Monthly'] * 12 / \
+            365 + cost_dict['Quarterly'] * 4 / 365 + cost_dict['Annual'] / 365
+        cost_monthly = cost_dict['Daily'] * 365 / 12 + cost_dict['Monthly'] + \
+            cost_dict['Quarterly'] / 3 + cost_dict['Annual'] / 12
+        cost_quarterly = cost_dict['Daily'] * 365 / 4 + cost_dict['Monthly'] * \
+            3 + cost_dict['Quarterly'] + cost_dict['Annual'] / 4
+        cost_annual = cost_dict['Daily'] * 365 + cost_dict['Monthly'] * \
+            12 + cost_dict['Quarterly'] * 4 + cost_dict['Annual']
+
+        match frequency_selected:
+            case 'Daily':
+                print(
+                    f'Based on your subscriptions, your estimated daily cost is ${round(cost_daily,2)}')
+            case 'Monthly':
+                print(
+                    f'Based on your subscriptions, your estimated monthly cost is ${round(cost_monthly,2)}')
+            case 'Quarterly':
+                print(
+                    f'Based on your subscriptions, your estimated quarterly cost is ${round(cost_quarterly,2)}')
+            case 'Annual':
+                print(
+                    f'Based on your subscriptions, your estimated annual cost is ${round(cost_annual,2)}')
 
 
 new_sub = Subscription()
@@ -201,7 +238,8 @@ new_sub = Subscription()
 # new_sub.add_subscription()
 # new_sub.view_subscription()
 
-new_sub.update_subscription()
+# new_sub.update_subscription()
 # new_sub.select_subscription('Utility')
 # new_sub.delete_subscription()
 # print(new_sub.is_empty())
+new_sub.cost()
