@@ -1,4 +1,4 @@
-from json_handling import read_json, write_json
+from json_handling import read_json, write_json, delete_json
 from terminal_menu import terminal_menu
 import json
 
@@ -7,12 +7,6 @@ class Subscription():
 
     def __init__(self, filepath='./src/subscription.json'):
         self.filepath = filepath
-
-    # def file_data(self):
-    #     with open(self.filepath, 'r') as file:
-    #         file_data = json.load(file)
-
-    #     return file_data
 
     def category_list(self, mode):
         file_data = read_json(self.filepath)
@@ -36,15 +30,7 @@ class Subscription():
     def select_category(self, mode):
         # get category list based on different mode
         category_option = self.category_list(mode)
-
-        match mode:
-            case 'view':
-                prompt = 'To view current subscriptions, please select a category:'
-            case 'add':
-                prompt = 'To add new subscription, please select a category of the subscription:'
-            case 'update':
-                prompt = 'To update existing subscription, please select a category of the subscription:'
-
+        prompt = 'Please select a category of the subscription:'
         # get user to select category
         category_selected = terminal_menu(category_option, prompt)
         # if user would like to add new category, ask for new category name
@@ -57,9 +43,18 @@ class Subscription():
     def select_subscription(self, category):
         file_data = read_json(self.filepath)
         subscription_list = file_data[category]
+
+        # ask user to select name of the subscription
         prompt = 'Please select one subscription to update:'
-        subscription_selected = terminal_menu(
+        subscription_name_selected = terminal_menu(
             [sub['Name'] for sub in subscription_list], prompt)
+
+        # get the dictionary with corresponding name
+        for i in subscription_list:
+            if i['Name'] == subscription_name_selected:
+                subscription_selected = i
+                break
+
         return subscription_selected
 
     def view_subscription(self):
@@ -85,7 +80,7 @@ class Subscription():
         # avoid duplicates
         while name.lower() in [sub.lower() for sub in existing_subscription]:
             name = input(
-                'Subscription exists! Please enter a different name: ')
+                'Name exists! Please enter a different name: ')
 
         return name
 
@@ -130,26 +125,37 @@ class Subscription():
     def update_subscription(self):
         # ask user to select a category first
         category_selected = self.select_category(mode='update')
+        # ask user to select a subscription
+        subscription_selected = self.select_subscription(category_selected)
+        # delete the selected subscription first, then can add back the updated one
+        delete_json(category_selected, subscription_selected, self.filepath)
 
-        self.select_subscription(category_selected)
+        prompt = 'Please select the attribute you would like to update:'
+        # turn the dict into a list so it can be passed into the terminal_menu function
+        option_list = ['Category'+ ': ' + category_selected]
+        for key, value in subscription_selected.items():
+            option_list.append(str(key) + ': ' + str(value))
 
-        file_data = read_json(self.filepath)
+        selected_attribute = terminal_menu(option_list, prompt)
 
-        # ask for user to select one subscription to update
-        # print('Please select one subscription to update:')
-        # with open(self.filepath, 'r') as file:
-        #     file_data = json.load(file)
-
-        # list_of_sub = file_data[category_selected]
-        # subscription_menu = Menu([sub['Name'] for sub in list_of_sub])
-        # subscription_selected = subscription_menu.print_menu()
-        # print(subscription_selected)
+        # update the subscription based on user's input
+        if 'Category: ' in selected_attribute:
+            category_selected = self.select_category(mode = 'add')
+        if 'Name: ' in selected_attribute:
+            subscription_selected['Name'] = self.input_name()
+        if 'Frequency: ' in selected_attribute:
+            subscription_selected['Frequency'] = self.select_frequency()
+        if 'Charge: ' in selected_attribute:
+            subscription_selected['Charge'] = self.input_charge()
+        # write the updated subscription into database
+        write_json(category_selected, subscription_selected, self.filepath)
 
 
 new_sub = Subscription()
 # new_sub.input_name()
 # new_sub.category_list(mode='add')
-new_sub.add_subscription()
+# new_sub.add_subscription()
 # new_sub.view_subscription()
 
-# new_sub.update_subscription()
+new_sub.update_subscription()
+# new_sub.select_subscription('Utility')

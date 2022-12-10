@@ -1,10 +1,10 @@
 from simple_term_menu import TerminalMenu
 
-def terminal_menu(option, prompt):
+def terminal_menu(options, prompt):
     print(prompt)
-    terminal_menu = TerminalMenu(option)
+    terminal_menu = TerminalMenu(options)
     menu_entry_index = terminal_menu.show()
-    selected = option[menu_entry_index]
+    selected = options[menu_entry_index]
     print(selected)
     return selected
 
