@@ -1,66 +1,77 @@
-from json_handling import write_json
-from terminal_menu import Menu
+from json_handling import read_json, write_json
+from terminal_menu import terminal_menu
 import json
 
 
 class Subscription():
 
-    def __init__(self, filename='./src/subscription.json'):
-        self.filename = filename
+    def __init__(self, filepath='./src/subscription.json'):
+        self.filepath = filepath
 
-    def view_subscription(self):
-        with open(self.filename, 'r') as file:
-            file_data = json.load(file)
+    # def file_data(self):
+    #     with open(self.filepath, 'r') as file:
+    #         file_data = json.load(file)
 
-            # get the categories of existing subscriptions
-            category_option = list(file_data.keys())
-            category_option.insert(0, 'View All')
+    #     return file_data
 
-            # prompt a terminal menu to ask for user to select a category
-            category_menu = Menu(category_option)
-            print('To view current subscriptions, please select a category:')
-            category_selected = category_menu.print_menu()
-            print(category_selected)
+    def category_list(self, mode):
+        file_data = read_json(self.filepath)
+        # read JSON file and get the list of category
+        category_list = list(file_data.keys())
 
-            # print the subscriptions
-            if category_selected == 'View All':
-                print(json.dumps(file_data, indent=4))
-            else:
-                print(json.dumps(file_data[category_selected], indent=2))
+        # when view subscriptions, add an option to view all
+        if mode == 'view':
+            category_list.insert(0, 'View All')
+        # when add subscriptions, show all existing categories and anything left in the default category
+        elif mode == 'add':
+            default_category = ['Entertainment', 'Productivity', 'Utility']
+            category_list = list(
+                set(category_list).union(set(default_category)))
+            category_list.append('Add New Category')
 
-    def add_subscription(self):
-        category_option = ['Entertainment', 'Productivity', 'Utility']
+        return category_list
 
-        with open(self.filename, 'r') as file:
-            file_data = json.load(file)
-            # get the categories of existing subscriptions
-            for option in list(file_data.keys()):
-                if option not in category_option:
-                    category_option.append(option)
+    def select_category(self, mode):
+        # get category list based on different mode
+        category_option = self.category_list(mode)
 
-            category_option.append('Add New Category')
+        if mode == 'view':
+            prompt = 'To view current subscriptions, please select a category:'
+        elif mode == 'add':
+            prompt = 'To add new subscription, please select a category of the subscription:'
 
-        category_menu = Menu(category_option)
-        print('To add new subscription, please select a category of the subscription: ')
-        category_selected = category_menu.print_menu()
-
+        # get user to select category
+        category_selected = terminal_menu(category_option, prompt)
         # if user would like to add new category, ask for new category name
         if category_selected == 'Add New Category':
             category_selected = input(
                 'Please enter the name of the new category: ')
-        else:
-            print(category_selected)
 
+        return category_selected
+
+    def view_subscription(self):
+        file_data = read_json(self.filepath)
+        category_selected = self.select_category(mode='view')
+
+        # print the subscriptions
+        if category_selected == 'View All':
+            print(json.dumps(file_data, indent=4))
+        else:
+            print(json.dumps(file_data[category_selected], indent=4))
+
+    def input_name(self):
         # ask for name of the subscription
         name = input('Please enter the name of the subscription: ')
+        return name
 
+    def select_frequency(self):
         # ask for frequency of the subscription
         frequency_option = ["Daily", "Monthly", "Quarterly", "Annual"]
-        frequency_menu = Menu(frequency_option)
-        print('Please select the frequency of subscription:')
-        frequency_selected = frequency_menu.print_menu()
-        print(frequency_selected)
+        prompt = 'Please select the frequency of subscription:'
+        frequency_selected = terminal_menu(frequency_option, prompt)
+        return frequency_selected
 
+    def input_charge(self):
         # ask for charge of the subscription
         while True:
             try:
@@ -73,16 +84,45 @@ class Subscription():
             else:
                 break
 
+        return charge
+
+    def add_subscription(self):
+        category_selected = self.select_category(mode='add')
+        name = self.input_name()
+        frequency_selected = self.select_frequency()
+        charge = self.input_charge()
+
         new_subscription = {
             'Name': name,
             'Frequency': frequency_selected,
             'Charge': charge
         }
 
+        print(new_subscription)
         # add new subscription to the list using the function write_json
-        write_json(category_selected, new_subscription, self.filename)
+        write_json(category_selected, new_subscription, self.filepath)
+
+    def update_subscription(self):
+        # print existing categories for user to select
+        category_menu = Menu(self.existing_category())
+        print('To update existing subscription, please select a category of the subscription: ')
+        category_selected = category_menu.print_menu()
+        print(category_selected)
+
+        # ask for user to select one subscription to update
+        print('Please select one subscription to update:')
+        with open(self.filepath, 'r') as file:
+            file_data = json.load(file)
+
+        list_of_sub = file_data[category_selected]
+        subscription_menu = Menu([sub['Name'] for sub in list_of_sub])
+        subscription_selected = subscription_menu.print_menu()
+        print(subscription_selected)
 
 
 new_sub = Subscription()
-# new_sub.add_subscription()
-new_sub.view_subscription()
+# new_sub.category_list(mode='add')
+new_sub.add_subscription()
+# new_sub.view_subscription()
+
+# new_sub.update_subscription()

@@ -10,4 +10,10 @@ https://www.freecodecamp.org/news/how-to-write-a-good-readme-file/#:~:text=In%20
 
 ## How to use this project
 
+## limitations and future expectations
+
+- terminal menu can be more sophisticated, such as add preview window, allow multiple choice
+
+- can allow to add more contents to each subscription in the future, such as website url, etc. 
+
 ## Credits

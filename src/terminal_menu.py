@@ -1,16 +1,12 @@
 from simple_term_menu import TerminalMenu
 
-
-# define Terminal_menu class
-class Menu():
-
-    def __init__(self, option):
-        self.option = option
-
-    def print_menu(self):
-        terminal_menu = TerminalMenu(self.option)
-        menu_entry_index = terminal_menu.show()
-        return self.option[menu_entry_index]
+def terminal_menu(option, prompt):
+    print(prompt)
+    terminal_menu = TerminalMenu(option)
+    menu_entry_index = terminal_menu.show()
+    selected = option[menu_entry_index]
+    print(selected)
+    return selected
 
 
 # main_menu = ["View All Subscriptions", "Add New Subscription",
