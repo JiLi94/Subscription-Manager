@@ -1,12 +1,1 @@
-{
-    "Entertainment": [
-        {
-            "Name": "apple tv",
-            "Frequency": "Quarterly",
-            "Charge": 12.0
-        }
-    ],
-    "Productivity": [],
-    "Utility": [],
-    "lala": []
-}
+{"Entertainment": [{"Name": "Amazon", "Frequency": "Monthly", "Charge": 7.0}]}

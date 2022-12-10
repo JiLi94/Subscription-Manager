@@ -32,6 +32,10 @@ def delete_json(category, subscription, filepath):
     file_data = read_json(filepath)
     file_data[category].remove(subscription)
 
+    # if no subscription exists under the category, delete the category
+    if file_data[category] == []:
+        del file_data[category]
+
     with open(filepath, 'w') as file:
         json.dump(file_data, file)
 
@@ -42,3 +46,4 @@ def delete_json(category, subscription, filepath):
 #     new_list.append(str(i))
 
 # print(new_list)
+
