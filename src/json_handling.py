@@ -47,3 +47,7 @@ def delete_json(category, subscription, filepath):
 
 # print(new_list)
 
+from datetime import datetime
+input = '2022-10-12'
+print(datetime.strptime(input, '%Y-%m-%d').date())
+

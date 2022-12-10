@@ -1,5 +1,6 @@
 from json_handling import read_json, write_json, delete_json
 from terminal_menu import terminal_menu
+from datetime import datetime
 import json
 
 
@@ -116,17 +117,35 @@ class Subscription():
 
         return charge
 
+    def input_date(self):
+        user_input = input(
+            'Please enter the date of the first bill in the format of yyyy-mm-dd: ')
+        while True:
+            # error handling, when user didn't input a valid date
+            try:
+                first_bill_date = datetime.strptime(user_input, '%Y-%m-%d').date()
+                break
+            except ValueError:
+                user_input = input('Please enter a valid date in the format of yyyy-mm-dd: ')
+                continue
+            else:
+                break
+
+        return str(first_bill_date)
+
     def add_subscription(self):
         # ask user to select/input attributes
         category_selected = self.select_category(mode='add')
         name = self.input_name()
         frequency_selected = self.select_frequency()
         charge = self.input_charge()
+        first_bill_date = self.input_date()
 
         new_subscription = {
             'Name': name,
             'Frequency': frequency_selected,
-            'Charge': charge
+            'Charge': charge,
+            'First bill date': first_bill_date
         }
 
         print(new_subscription)
@@ -188,6 +207,8 @@ class Subscription():
                 selected[1]['Frequency'] = self.select_frequency()
             if 'Charge: ' in selected_attribute:
                 selected[1]['Charge'] = self.input_charge()
+            if 'First bill date: ' in selected_attribute:
+                selected[1]['First bill date'] = self.input_date()
             # write the updated subscription into database
             write_json(selected[0], selected[1], self.filepath)
 
@@ -206,7 +227,6 @@ class Subscription():
                         cost += sub['Charge']
             cost_dict[frequency] = cost
 
-        print(cost_dict)
         # calculate the estimated cost for each frequency
         cost_daily = cost_dict['Daily'] + cost_dict['Monthly'] * 12 / \
             365 + cost_dict['Quarterly'] * 4 / 365 + cost_dict['Annual'] / 365
@@ -240,6 +260,6 @@ new_sub = Subscription()
 
 # new_sub.update_subscription()
 # new_sub.select_subscription('Utility')
-# new_sub.delete_subscription()
+new_sub.delete_subscription()
 # print(new_sub.is_empty())
-new_sub.cost()
+# new_sub.cost()
