@@ -28,6 +28,8 @@ class Subscription():
             category_list = list(
                 set(category_list).union(set(default_category)))
             category_list.append('Add New Category')
+        elif mode == 'update':
+            pass
 
         return category_list
 
@@ -35,10 +37,13 @@ class Subscription():
         # get category list based on different mode
         category_option = self.category_list(mode)
 
-        if mode == 'view':
-            prompt = 'To view current subscriptions, please select a category:'
-        elif mode == 'add':
-            prompt = 'To add new subscription, please select a category of the subscription:'
+        match mode:
+            case 'view':
+                prompt = 'To view current subscriptions, please select a category:'
+            case 'add':
+                prompt = 'To add new subscription, please select a category of the subscription:'
+            case 'update':
+                prompt = 'To update existing subscription, please select a category of the subscription:'
 
         # get user to select category
         category_selected = terminal_menu(category_option, prompt)
@@ -48,6 +53,14 @@ class Subscription():
                 'Please enter the name of the new category: ')
 
         return category_selected
+
+    def select_subscription(self, category):
+        file_data = read_json(self.filepath)
+        subscription_list = file_data[category]
+        prompt = 'Please select one subscription to update:'
+        subscription_selected = terminal_menu(
+            [sub['Name'] for sub in subscription_list], prompt)
+        return subscription_selected
 
     def view_subscription(self):
         file_data = read_json(self.filepath)
@@ -60,8 +73,20 @@ class Subscription():
             print(json.dumps(file_data[category_selected], indent=4))
 
     def input_name(self):
+        # get names of existing subscriptions
+        file_data = read_json(self.filepath)
+        existing_subscription = []
+        for category in file_data:
+            for subscription in file_data[category]:
+                existing_subscription.append(subscription['Name'])
+
         # ask for name of the subscription
         name = input('Please enter the name of the subscription: ')
+        # avoid duplicates
+        while name.lower() in [sub.lower() for sub in existing_subscription]:
+            name = input(
+                'Subscription exists! Please enter a different name: ')
+
         return name
 
     def select_frequency(self):
@@ -103,24 +128,26 @@ class Subscription():
         write_json(category_selected, new_subscription, self.filepath)
 
     def update_subscription(self):
-        # print existing categories for user to select
-        category_menu = Menu(self.existing_category())
-        print('To update existing subscription, please select a category of the subscription: ')
-        category_selected = category_menu.print_menu()
-        print(category_selected)
+        # ask user to select a category first
+        category_selected = self.select_category(mode='update')
+
+        self.select_subscription(category_selected)
+
+        file_data = read_json(self.filepath)
 
         # ask for user to select one subscription to update
-        print('Please select one subscription to update:')
-        with open(self.filepath, 'r') as file:
-            file_data = json.load(file)
+        # print('Please select one subscription to update:')
+        # with open(self.filepath, 'r') as file:
+        #     file_data = json.load(file)
 
-        list_of_sub = file_data[category_selected]
-        subscription_menu = Menu([sub['Name'] for sub in list_of_sub])
-        subscription_selected = subscription_menu.print_menu()
-        print(subscription_selected)
+        # list_of_sub = file_data[category_selected]
+        # subscription_menu = Menu([sub['Name'] for sub in list_of_sub])
+        # subscription_selected = subscription_menu.print_menu()
+        # print(subscription_selected)
 
 
 new_sub = Subscription()
+# new_sub.input_name()
 # new_sub.category_list(mode='add')
 new_sub.add_subscription()
 # new_sub.view_subscription()
