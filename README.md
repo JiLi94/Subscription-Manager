@@ -14,6 +14,8 @@ https://www.freecodecamp.org/news/how-to-write-a-good-readme-file/#:~:text=In%20
 
 - terminal menu can be more sophisticated, such as add preview window, allow multiple choice
 
+- allow reverse actions
+
 - can allow to add more contents to each subscription in the future, such as website url, etc. 
 
 ## Credits

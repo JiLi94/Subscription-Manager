@@ -45,7 +45,7 @@ class Subscription():
         subscription_list = file_data[category]
 
         # ask user to select name of the subscription
-        prompt = 'Please select one subscription to update:'
+        prompt = 'Please select one subscription:'
         subscription_name_selected = terminal_menu(
             [sub['Name'] for sub in subscription_list], prompt)
 
@@ -122,34 +122,39 @@ class Subscription():
         # add new subscription to the list using the function write_json
         write_json(category_selected, new_subscription, self.filepath)
 
-    def update_subscription(self):
+    def delete_subscription(self):
         # ask user to select a category first
         category_selected = self.select_category(mode='update')
         # ask user to select a subscription
         subscription_selected = self.select_subscription(category_selected)
         # delete the selected subscription first, then can add back the updated one
         delete_json(category_selected, subscription_selected, self.filepath)
+        # print('Deleted successfully!')
+        return [category_selected, subscription_selected]
+
+    def update_subscription(self):
+        # delete the selected subscription first, then can add back the updated one
+        selected = self.delete_subscription()
 
         prompt = 'Please select the attribute you would like to update:'
         # turn the dict into a list so it can be passed into the terminal_menu function
-        option_list = ['Category'+ ': ' + category_selected]
-        for key, value in subscription_selected.items():
+        option_list = ['Category'+ ': ' + selected[0]]
+        for key, value in selected[1].items():
             option_list.append(str(key) + ': ' + str(value))
 
         selected_attribute = terminal_menu(option_list, prompt)
 
         # update the subscription based on user's input
         if 'Category: ' in selected_attribute:
-            category_selected = self.select_category(mode = 'add')
+            selected[0] = self.select_category(mode = 'add')
         if 'Name: ' in selected_attribute:
-            subscription_selected['Name'] = self.input_name()
+            selected[1]['Name'] = self.input_name()
         if 'Frequency: ' in selected_attribute:
-            subscription_selected['Frequency'] = self.select_frequency()
+            selected[1]['Frequency'] = self.select_frequency()
         if 'Charge: ' in selected_attribute:
-            subscription_selected['Charge'] = self.input_charge()
+            selected[1]['Charge'] = self.input_charge()
         # write the updated subscription into database
-        write_json(category_selected, subscription_selected, self.filepath)
-
+        write_json(selected[0], selected[1], self.filepath)
 
 new_sub = Subscription()
 # new_sub.input_name()
@@ -159,3 +164,4 @@ new_sub = Subscription()
 
 new_sub.update_subscription()
 # new_sub.select_subscription('Utility')
+# new_sub.delete_subscription()
