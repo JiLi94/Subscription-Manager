@@ -8,6 +8,9 @@ def read_json(filepath):
 
     return file_data
 
+def print_json(file_data, indent):
+    print(json.dumps(file_data, indent))
+
 
 def write_json(category, subscription, filepath):
     file_data = read_json(filepath)
@@ -38,16 +41,4 @@ def delete_json(category, subscription, filepath):
 
     with open(filepath, 'w') as file:
         json.dump(file_data, file)
-
-# file_data = read_json('./src/subscription.json')
-# print(str(file_data['Utility']))
-# new_list = []
-# for i in file_data['Utility']:
-#     new_list.append(str(i))
-
-# print(new_list)
-
-from datetime import datetime
-input = '2022-10-12'
-print(datetime.strptime(input, '%Y-%m-%d').date())
 

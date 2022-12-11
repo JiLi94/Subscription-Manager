@@ -1,12 +1,11 @@
-from json_handling import read_json, write_json, delete_json
+from json_handling import read_json, print_json, write_json, delete_json
 from terminal_menu import terminal_menu
 from datetime import datetime
-import json
 
 
 class Subscription():
 
-    def __init__(self, filepath='./src/subscription.json'):
+    def __init__(self, filepath='./src/data/subscription.json'):
         self.filepath = filepath
         self.frequency_option = ["Daily", "Monthly", "Quarterly", "Annual"]
         self.default_category = ['Entertainment', 'Productivity', 'Utility']
@@ -28,9 +27,10 @@ class Subscription():
             category_list.insert(0, 'View All')
         # when add subscriptions, show all existing categories and anything left in the default category
         elif mode == 'add':
-
             category_list = list(
                 set(category_list).union(set(self.default_category)))
+            # sort the category list alphabetically
+            category_list = sorted(category_list)
             category_list.append('Add New Category')
         elif mode == 'update':
             pass
@@ -75,9 +75,9 @@ class Subscription():
         if self.is_empty():
             print('You don\'t have any existing subscriptions')
         elif category_selected == 'View All':
-            print(json.dumps(file_data, indent=4))
+            print_json(file_data, indent=4)
         else:
-            print(json.dumps(file_data[category_selected], indent=4))
+            print_json(file_data[category_selected], indent=4)
 
     def input_name(self):
         # get names of existing subscriptions
@@ -108,7 +108,10 @@ class Subscription():
             try:
                 charge = float(
                     input('Please enter the charge of the subscription: '))
-            # if user doesn't enter a correct number, ask again
+                if charge < 0:
+                    print('Please enter a valid number!')
+                    continue
+            # if user doesn't enter a valid number, ask again
             except ValueError:
                 print('Please enter a valid number!')
                 continue
@@ -123,10 +126,12 @@ class Subscription():
         while True:
             # error handling, when user didn't input a valid date
             try:
-                first_bill_date = datetime.strptime(user_input, '%Y-%m-%d').date()
+                first_bill_date = datetime.strptime(
+                    user_input, '%Y-%m-%d').date()
                 break
             except ValueError:
-                user_input = input('Please enter a valid date in the format of yyyy-mm-dd: ')
+                user_input = input(
+                    'Please enter a valid date in the format of yyyy-mm-dd: ')
                 continue
             else:
                 break
@@ -189,28 +194,40 @@ class Subscription():
         else:
             # delete the selected subscription first, then can add back the updated one
             selected = self.delete_subscription(mode='update')
+            category_selected = selected[0]
+            subscription_selected = selected[1]
 
-            prompt = 'Please select the attribute you would like to update:'
-            # turn the dict into a list so it can be passed into the terminal_menu function
-            option_list = ['Category' + ': ' + selected[0]]
-            for key, value in selected[1].items():
-                option_list.append(str(key) + ': ' + str(value))
+            # keep asking user to update attributes unless user selects 'Done'
+            while True:
+                # turn the dict into a list so it can be passed into the terminal_menu function
+                option_list = ['Category' + ': ' + category_selected]
+                for key, value in subscription_selected.items():
+                    option_list.append(str(key) + ': ' + str(value))
 
-            selected_attribute = terminal_menu(option_list, prompt)
+                option_list.append('Done')
 
-            # update the subscription based on user's selection
-            if 'Category: ' in selected_attribute:
-                selected[0] = self.select_category(mode='add')
-            if 'Name: ' in selected_attribute:
-                selected[1]['Name'] = self.input_name()
-            if 'Frequency: ' in selected_attribute:
-                selected[1]['Frequency'] = self.select_frequency()
-            if 'Charge: ' in selected_attribute:
-                selected[1]['Charge'] = self.input_charge()
-            if 'First bill date: ' in selected_attribute:
-                selected[1]['First bill date'] = self.input_date()
+                prompt = 'Please select the attribute you would like to update:'
+                selected_attribute = terminal_menu(option_list, prompt)
+
+                # update the subscription based on user's selection
+                if 'Category: ' in selected_attribute:
+                    category_selected = self.select_category(mode='add')
+                if 'Name: ' in selected_attribute:
+                    subscription_selected['Name'] = self.input_name()
+                if 'Frequency: ' in selected_attribute:
+                    subscription_selected['Frequency'] = self.select_frequency(
+                    )
+                if 'Charge: ' in selected_attribute:
+                    subscription_selected['Charge'] = self.input_charge()
+                if 'First bill date: ' in selected_attribute:
+                    subscription_selected['First bill date'] = self.input_date(
+                    )
+                # user finishes updating
+                if selected_attribute == 'Done':
+                    break
             # write the updated subscription into database
-            write_json(selected[0], selected[1], self.filepath)
+            write_json(category_selected,
+                       subscription_selected, self.filepath)
 
     def cost(self):
         frequency_selected = self.select_frequency()
@@ -237,29 +254,24 @@ class Subscription():
         cost_annual = cost_dict['Daily'] * 365 + cost_dict['Monthly'] * \
             12 + cost_dict['Quarterly'] * 4 + cost_dict['Annual']
 
-        match frequency_selected:
-            case 'Daily':
-                print(
-                    f'Based on your subscriptions, your estimated daily cost is ${round(cost_daily,2)}')
-            case 'Monthly':
-                print(
-                    f'Based on your subscriptions, your estimated monthly cost is ${round(cost_monthly,2)}')
-            case 'Quarterly':
-                print(
-                    f'Based on your subscriptions, your estimated quarterly cost is ${round(cost_quarterly,2)}')
-            case 'Annual':
-                print(
-                    f'Based on your subscriptions, your estimated annual cost is ${round(cost_annual,2)}')
+        cost_dict['Daily'] = cost_daily
+        cost_dict['Monthly'] = cost_monthly
+        cost_dict['Quarterly'] = cost_quarterly
+        cost_dict['Annual'] = cost_annual
+
+        # print results
+        print(
+            f'Based on your subscriptions, your estimated {frequency_selected.lower()} cost is ${round(cost_dict[frequency_selected],2)}')
 
 
 new_sub = Subscription()
 # new_sub.input_name()
 # new_sub.category_list(mode='add')
-# new_sub.add_subscription()
+new_sub.add_subscription()
 # new_sub.view_subscription()
 
 # new_sub.update_subscription()
 # new_sub.select_subscription('Utility')
-new_sub.delete_subscription()
+# new_sub.delete_subscription()
 # print(new_sub.is_empty())
 # new_sub.cost()
