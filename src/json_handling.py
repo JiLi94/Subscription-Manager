@@ -4,13 +4,12 @@ import json
 def read_json(filepath):
     with open(filepath, 'r') as file:
         file_data = json.load(file)
-        # print(json.dumps(file_data, indent=2))  # pretty print JSON
 
     return file_data
 
 
 def print_json(file_data, indent):
-    print(json.dumps(file_data, indent))
+    print(json.dumps(file_data, indent = indent))
 
 
 def write_json(category, subscription, filepath):

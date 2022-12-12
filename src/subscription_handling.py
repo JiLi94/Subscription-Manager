@@ -1,6 +1,7 @@
 from json_handling import read_json, print_json, write_json, delete_json
 from terminal_menu import terminal_menu
 from datetime import datetime
+import json
 
 
 class Subscription():
@@ -9,18 +10,17 @@ class Subscription():
         self.filepath = filepath
         self.frequency_option = ["Daily", "Monthly", "Quarterly", "Annual"]
         self.default_category = ['Entertainment', 'Productivity', 'Utility']
+        self.file_data = read_json(self.filepath)
 
     def is_empty(self):
-        file_data = read_json(self.filepath)
-        if file_data == {}:
+        if self.file_data == {}:
             return True
         else:
             return False
 
     def category_list(self, mode):
-        file_data = read_json(self.filepath)
         # read JSON file and get the list of category
-        category_list = list(file_data.keys())
+        category_list = list(self.file_data.keys())
 
         # when view subscriptions, add an option to view all
         if mode == 'view':
@@ -46,19 +46,22 @@ class Subscription():
         # if user would like to add new category, ask for new category name
         if category_selected == 'Add New Category':
             category_selected = input(
-                'Please enter the name of the new category: ')
+                'Please enter the name of the new category: ').strip()
             # data validation, when input is empty
-            while True:
-                if category_selected == '':
-                    category_selected = input('Please enter a valid category name: ')
-                else:
-                    break   
+            while category_selected == '':
+                category_selected = input(
+                    'Please enter a valid category name: ').strip()
+
+            # avoid duplicates
+            for category in category_option:
+                if category_selected.lower() == category.lower():
+                    category_selected = category
+                    break
 
         return category_selected
 
     def select_subscription(self, category):
-        file_data = read_json(self.filepath)
-        subscription_list = file_data[category]
+        subscription_list = self.file_data[category]
 
         # ask user to select name of the subscription
         prompt = 'Please select one subscription:'
@@ -74,36 +77,35 @@ class Subscription():
         return subscription_selected
 
     def view_subscription(self):
-        file_data = read_json(self.filepath)
-        category_selected = self.select_category(mode='view')
-
-        # print the subscriptions
         if self.is_empty():
             print('You don\'t have any existing subscriptions')
-        elif category_selected == 'View All':
-            print_json(file_data, indent=4)
         else:
-            print_json(file_data[category_selected], indent=4)
+            self.file_data = read_json(self.filepath)
+            category_selected = self.select_category(mode='view')
+
+            if category_selected == 'View All':
+                print_json(self.file_data, 4)
+            else:
+                print_json(self.file_data[category_selected], 4)
 
     def input_name(self):
         # get names of existing subscriptions
-        file_data = read_json(self.filepath)
         existing_subscription = []
-        for category in file_data:
-            for subscription in file_data[category]:
+        for category in self.file_data:
+            for subscription in self.file_data[category]:
                 existing_subscription.append(subscription['Name'])
 
         # ask for name of the subscription
-        name = input('Please enter the name of the subscription: ')
+        name = input('Please enter the name of the subscription: ').strip()
 
         while True:
             # data validation, when input is empty
             if name == '':
                 name = input('Please enter a valid name: ')
             # avoid duplicates
-            elif name.lower() in [sub.lower() for sub in existing_subscription]:
+            elif name.lower().strip() in [sub.lower() for sub in existing_subscription]:
                 name = input(
-                    'Subscription exists! Please enter a different name: ')
+                    'Subscription exists! Please enter a different name: ').strip()
             else:
                 break
 
@@ -122,7 +124,7 @@ class Subscription():
                 charge = float(
                     input('Please enter the charge of the subscription: '))
                 if charge < 0:
-                    print('Please enter a valid number!')
+                    print('Please enter a positive number!')
                     continue
             # if user doesn't enter a valid number, ask again
             except ValueError:
@@ -214,23 +216,28 @@ class Subscription():
                 option_list.append('Done')
 
                 prompt = 'Please select the attribute you would like to update:'
-                selected_attribute = terminal_menu(option_list, prompt)
+                # get what attribute of the subscription the user has selected, possible output: Category, Name, Frequency, Charge, First bill data
+                selected_attribute = terminal_menu(
+                    option_list, prompt).split(':')[0]
 
                 # update the subscription based on user's selection
-                if 'Category: ' in selected_attribute:
-                    category_selected_updated = self.select_category(
-                        mode='add')
-                if 'Name: ' in selected_attribute:
-                    subscription_selected_updated['Name'] = self.input_name()
-                if 'Frequency: ' in selected_attribute:
-                    subscription_selected_updated['Frequency'] = self.select_frequency(
-                    )
-                if 'Charge: ' in selected_attribute:
-                    subscription_selected_updated['Charge'] = self.input_charge(
-                    )
-                if 'First bill date: ' in selected_attribute:
-                    subscription_selected_updated['First bill date'] = self.input_date(
-                    )
+                match selected_attribute:
+                    case 'Category':
+                        category_selected_updated = self.select_category(
+                            mode='add')
+                    case 'Name':
+                        subscription_selected_updated['Name'] = self.input_name(
+                        )
+                    case 'Frequency':
+                        subscription_selected_updated['Frequency'] = self.select_frequency(
+                        )
+                    case 'Charge':
+                        subscription_selected_updated['Charge'] = self.input_charge(
+                        )
+                    case 'First bill date':
+                        subscription_selected_updated['First bill date'] = self.input_date(
+                        )
+
                 # user finishes updating
                 if selected_attribute == 'Done':
                     break
@@ -245,13 +252,13 @@ class Subscription():
     def cost(self):
         frequency_selected = self.select_frequency()
 
-        file_data = read_json(self.filepath)
+        # file_data = read_json(self.filepath)
         # calculate total cost of each frequency
         cost_dict = {}
         for frequency in self.frequency_option:
             cost = 0
-            for category in file_data:
-                for sub in file_data[category]:
+            for category in self.file_data:
+                for sub in self.file_data[category]:
                     # print(sub)
                     if sub['Frequency'] == frequency:
                         cost += sub['Charge']
@@ -277,10 +284,10 @@ class Subscription():
             f'Based on your subscriptions, your estimated {frequency_selected.lower()} cost is ${round(cost_dict[frequency_selected],2)}')
 
 
-new_sub = Subscription('./src/data/subscription.json')
+# new_sub = Subscription('./src/data/subscription.json')
 # new_sub.input_name()
 # new_sub.category_list(mode='add')
-new_sub.add_subscription()
+# new_sub.add_subscription()
 # new_sub.view_subscription()
 
 # new_sub.update_subscription()
