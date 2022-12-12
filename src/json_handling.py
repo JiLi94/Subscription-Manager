@@ -8,6 +8,7 @@ def read_json(filepath):
 
     return file_data
 
+
 def print_json(file_data, indent):
     print(json.dumps(file_data, indent))
 
@@ -41,4 +42,3 @@ def delete_json(category, subscription, filepath):
 
     with open(filepath, 'w') as file:
         json.dump(file_data, file)
-

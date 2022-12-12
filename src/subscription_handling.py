@@ -5,7 +5,7 @@ from datetime import datetime
 
 class Subscription():
 
-    def __init__(self, filepath='./src/data/subscription.json'):
+    def __init__(self, filepath):
         self.filepath = filepath
         self.frequency_option = ["Daily", "Monthly", "Quarterly", "Annual"]
         self.default_category = ['Entertainment', 'Productivity', 'Utility']
@@ -47,6 +47,12 @@ class Subscription():
         if category_selected == 'Add New Category':
             category_selected = input(
                 'Please enter the name of the new category: ')
+            # data validation, when input is empty
+            while True:
+                if category_selected == '':
+                    category_selected = input('Please enter a valid category name: ')
+                else:
+                    break   
 
         return category_selected
 
@@ -89,10 +95,17 @@ class Subscription():
 
         # ask for name of the subscription
         name = input('Please enter the name of the subscription: ')
-        # avoid duplicates
-        while name.lower() in [sub.lower() for sub in existing_subscription]:
-            name = input(
-                'Subscription exists! Please enter a different name: ')
+
+        while True:
+            # data validation, when input is empty
+            if name == '':
+                name = input('Please enter a valid name: ')
+            # avoid duplicates
+            elif name.lower() in [sub.lower() for sub in existing_subscription]:
+                name = input(
+                    'Subscription exists! Please enter a different name: ')
+            else:
+                break
 
         return name
 
@@ -156,52 +169,46 @@ class Subscription():
         print(new_subscription)
         # add new subscription to the list using the function write_json
         write_json(category_selected, new_subscription, self.filepath)
+        return [category_selected, new_subscription]
 
-    def delete_subscription(self, mode='delete'):
+    def delete_subscription(self):
         if self.is_empty():
             print('You don\'t have any existing subscriptions')
         else:
-            # ask user to select a category first
+            # ask user to select a category and subscription first
             category_selected = self.select_category(mode='update')
-            # ask user to select a subscription
             subscription_selected = self.select_subscription(category_selected)
-            # delete the selected subscription
-            # if user selects to delete, add a confirmation before deleting
-            if mode == 'delete':
-                confirmation = input(
-                    f'Are you sure to delete {subscription_selected}? Input Yes/No to confirm: ')
-                while True:
-                    if confirmation.lower() == 'yes':
-                        delete_json(category_selected,
-                                    subscription_selected, self.filepath)
-                        print('Deleted successfully!')
-                        break
-                    elif confirmation.lower() == 'no':
-                        break
-                    else:
-                        confirmation = input(
-                            'Please enter "Yes" or "No" to confirm: ')
-            # if mode is not 'delete', no confirmation needed, because it will be added back later with updated info
-            else:
-                delete_json(category_selected,
-                            subscription_selected, self.filepath)
-
-            return [category_selected, subscription_selected]
+            confirmation = input(
+                f'Are you sure to delete {subscription_selected}? Input Yes/No to confirm: ')
+            while True:
+                if confirmation.lower() == 'yes':
+                    delete_json(category_selected,
+                                subscription_selected, self.filepath)
+                    print('Deleted successfully!')
+                    break
+                elif confirmation.lower() == 'no':
+                    break
+                else:
+                    confirmation = input(
+                        'Please enter "Yes" or "No" to confirm: ')
 
     def update_subscription(self):
         if self.is_empty():
             print('You don\'t have any existing subscriptions')
         else:
-            # delete the selected subscription first, then can add back the updated one
-            selected = self.delete_subscription(mode='update')
-            category_selected = selected[0]
-            subscription_selected = selected[1]
+            # ask user to select a category and subscription first
+            category_selected = self.select_category(mode='update')
+            subscription_selected = self.select_subscription(category_selected)
+
+            # assign category and subscription to another variable
+            category_selected_updated = category_selected
+            subscription_selected_updated = subscription_selected.copy()
 
             # keep asking user to update attributes unless user selects 'Done'
             while True:
                 # turn the dict into a list so it can be passed into the terminal_menu function
-                option_list = ['Category' + ': ' + category_selected]
-                for key, value in subscription_selected.items():
+                option_list = ['Category' + ': ' + category_selected_updated]
+                for key, value in subscription_selected_updated.items():
                     option_list.append(str(key) + ': ' + str(value))
 
                 option_list.append('Done')
@@ -211,23 +218,29 @@ class Subscription():
 
                 # update the subscription based on user's selection
                 if 'Category: ' in selected_attribute:
-                    category_selected = self.select_category(mode='add')
+                    category_selected_updated = self.select_category(
+                        mode='add')
                 if 'Name: ' in selected_attribute:
-                    subscription_selected['Name'] = self.input_name()
+                    subscription_selected_updated['Name'] = self.input_name()
                 if 'Frequency: ' in selected_attribute:
-                    subscription_selected['Frequency'] = self.select_frequency(
+                    subscription_selected_updated['Frequency'] = self.select_frequency(
                     )
                 if 'Charge: ' in selected_attribute:
-                    subscription_selected['Charge'] = self.input_charge()
+                    subscription_selected_updated['Charge'] = self.input_charge(
+                    )
                 if 'First bill date: ' in selected_attribute:
-                    subscription_selected['First bill date'] = self.input_date(
+                    subscription_selected_updated['First bill date'] = self.input_date(
                     )
                 # user finishes updating
                 if selected_attribute == 'Done':
                     break
+
+            # delete original subscription
+            delete_json(category_selected,
+                        subscription_selected, self.filepath)
             # write the updated subscription into database
-            write_json(category_selected,
-                       subscription_selected, self.filepath)
+            write_json(category_selected_updated,
+                       subscription_selected_updated, self.filepath)
 
     def cost(self):
         frequency_selected = self.select_frequency()
@@ -264,7 +277,7 @@ class Subscription():
             f'Based on your subscriptions, your estimated {frequency_selected.lower()} cost is ${round(cost_dict[frequency_selected],2)}')
 
 
-new_sub = Subscription()
+new_sub = Subscription('./src/data/subscription.json')
 # new_sub.input_name()
 # new_sub.category_list(mode='add')
 new_sub.add_subscription()

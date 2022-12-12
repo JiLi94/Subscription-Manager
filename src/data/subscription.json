@@ -1,1 +1,36 @@
-{"Productivity": [{"Name": "1", "Frequency": "Daily", "Charge": 1.0, "First bill date": "2020-12-12"}, {"Name": "1", "Frequency": "Monthly", "Charge": 1.0, "First bill date": "2020-12-12"}], "aaa": [{"Name": "111", "Frequency": "Monthly", "Charge": 12.0, "First bill date": "2020-12-12"}], "1283": [{"Name": "12", "Frequency": "Quarterly", "Charge": 12.0, "First bill date": "2020-12-12"}], "AA": [{"Name": "AA", "Frequency": "Monthly", "Charge": 12.0, "First bill date": "2020-12-12"}]}
+{
+    "Productivity": [
+        {
+            "Name": "1",
+            "Frequency": "Daily",
+            "Charge": 1.0,
+            "First bill date": "2020-12-12"
+        },
+        {
+            "Name": "1",
+            "Frequency": "Monthly",
+            "Charge": 1.0,
+            "First bill date": "2020-12-12"
+        },
+        {
+            "Name": "12",
+            "Frequency": "Quarterly",
+            "Charge": 15.0,
+            "First bill date": "2020-12-12"
+        },
+        {
+            "Name": "345",
+            "Frequency": "Monthly",
+            "Charge": 234.0,
+            "First bill date": "2020-12-12"
+        }
+    ],
+    "1": [
+        {
+            "Name": "2",
+            "Frequency": "Monthly",
+            "Charge": 12.0,
+            "First bill date": "2020-12-12"
+        }
+    ]
+}
