@@ -1,18 +1,20 @@
-# Terminal App - Subscription Management
+# JiLi_T1A3 Terminal App - Subscription Manager
 
-## source repo
+## GitHub repo
 
-##
+[JiLi_T1A3 - Subscription Manager](https://github.com/JiLi94/Subscription-Manager.git)
 
-## Project Description
+## Presentation video
 
-This project aims to help the user to create and manage their own subscription lists, the features include view current subscription list, create new subscription, update/delete existing subscriptions and calculate the cost based on their frequencies. This application only supports single user for now, but in the future hopefully it will be implemented more features so it can allow multiple users to create their own lists, and they can log in with their username and passwords.
+## Project description
+
+This project aims to help the user to create and manage their own subscription lists. The features include view current subscription list, create new subscription, update/delete existing subscriptions and calculate the cost based on their frequencies.
 
 https://www.freecodecamp.org/news/how-to-write-a-good-readme-file/#:~:text=In%20simple%20words%2C%20we%20can,install%20and%20run%20the%20project.
 
 ## How to install and run this project
 
-## How to use this project
+## Features
 
 ## Testing
 
@@ -64,8 +66,22 @@ This test was designed to test if the feature of deleting existing items works a
 
 - can allow to add more contents to each subscription in the future, such as website url, etc. 
 
+- This application only supports single user for now, but in the future hopefully it will be implemented more features so it can allow multiple users to create their own lists, and they can log in with their username and passwords.
+
 ## References
 
-- [simple terminal menu package](https://pypi.org/project/simple-term-menu/)
+- Packages & modules:
+
+    - For showing menus in terminal for user to select: [simple terminal menu package](https://pypi.org/project/simple-term-menu/)
+
+    - For manipulating JSON files: [json](https://docs.python.org/3/library/json.html)
+
+    - For conversion between strings and datetime: [datetime](https://docs.python.org/3/library/datetime.html)
+
+    - For get keyboard input from the user: [getkey](https://pypi.org/project/getkey/)
+
+    - For testing: [pytest](https://docs.pytest.org/en/7.2.x/getting-started.html)
+
+    - For tools to deal with filepath and directories: [sys](https://docs.python.org/3/library/sys.html) & [os](https://docs.python.org/3/library/os.html)
 
 - style guide: [pep8](https://peps.python.org/pep-0008/)

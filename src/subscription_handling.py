@@ -11,12 +11,18 @@ class Subscription():
         self.frequency_option = ["Daily", "Monthly", "Quarterly", "Annual"]
         self.default_category = ['Entertainment', 'Productivity', 'Utility']
         self.file_data = read_json(self.filepath)
+        self.main_menu = ['View existing subscriptions', 'Update existing subscriptions',
+                          'Delete existing subscriptions', 'Calculate my cost', 'Exit']
 
     def is_empty(self):
         if self.file_data == {}:
             return True
         else:
             return False
+    
+    def view_main_menu(self):
+        prompt = 'Welcome to your subscription manager, please select one option from the menu'
+        return terminal_menu(self.main_menu, prompt)
 
     def category_list(self, mode):
         # read JSON file and get the list of category
@@ -215,7 +221,7 @@ class Subscription():
 
                 option_list.append('Done')
 
-                prompt = 'Please select the attribute you would like to update:'
+                prompt = 'Please select the attribute you would like to update or select \'Done\' after finish:'
                 # get what attribute of the subscription the user has selected, possible output: Category, Name, Frequency, Charge, First bill data
                 selected_attribute = terminal_menu(
                     option_list, prompt).split(':')[0]
@@ -248,6 +254,8 @@ class Subscription():
             # write the updated subscription into database
             write_json(category_selected_updated,
                        subscription_selected_updated, self.filepath)
+            # print the updated record
+            print_json(subscription_selected_updated, 4)
 
     def cost(self):
         frequency_selected = self.select_frequency()
@@ -269,7 +277,7 @@ class Subscription():
             365 + cost_dict['Quarterly'] * 4 / 365 + cost_dict['Annual'] / 365
         cost_monthly = cost_dict['Daily'] * 365 / 12 + cost_dict['Monthly'] + \
             cost_dict['Quarterly'] / 3 + cost_dict['Annual'] / 12
-        cost_quarterly = cost_dict['´Daily'] * 365 / 4 + cost_dict['Monthly'] * \
+        cost_quarterly = cost_dict['Daily'] * 365 / 4 + cost_dict['Monthly'] * \
             3 + cost_dict['Quarterly'] + cost_dict['Annual'] / 4
         cost_annual = cost_dict['Daily'] * 365 + cost_dict['Monthly'] * \
             12 + cost_dict['Quarterly'] * 4 + cost_dict['Annual']
@@ -284,7 +292,7 @@ class Subscription():
             f'Based on your subscriptions, your estimated {frequency_selected.lower()} cost is ${round(cost_dict[frequency_selected],2)}')
 
 
-new_sub = Subscription('./src/data/subscription.json')
+# new_sub = Subscription('./src/data/subscription.json')
 # new_sub.input_name()
 # new_sub.category_list(mode='add')
 # new_sub.add_subscription()
@@ -292,6 +300,7 @@ new_sub = Subscription('./src/data/subscription.json')
 
 # new_sub.update_subscription()
 # new_sub.select_subscription('Utility')
-new_sub.delete_subscription()
+# new_sub.delete_subscription()
 # print(new_sub.is_empty())
 # new_sub.cost()
+# print(new_sub.view_main_menu())
