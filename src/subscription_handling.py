@@ -269,7 +269,7 @@ class Subscription():
             365 + cost_dict['Quarterly'] * 4 / 365 + cost_dict['Annual'] / 365
         cost_monthly = cost_dict['Daily'] * 365 / 12 + cost_dict['Monthly'] + \
             cost_dict['Quarterly'] / 3 + cost_dict['Annual'] / 12
-        cost_quarterly = cost_dict['Daily'] * 365 / 4 + cost_dict['Monthly'] * \
+        cost_quarterly = cost_dict['´Daily'] * 365 / 4 + cost_dict['Monthly'] * \
             3 + cost_dict['Quarterly'] + cost_dict['Annual'] / 4
         cost_annual = cost_dict['Daily'] * 365 + cost_dict['Monthly'] * \
             12 + cost_dict['Quarterly'] * 4 + cost_dict['Annual']
@@ -284,7 +284,7 @@ class Subscription():
             f'Based on your subscriptions, your estimated {frequency_selected.lower()} cost is ${round(cost_dict[frequency_selected],2)}')
 
 
-# new_sub = Subscription('./src/data/subscription.json')
+new_sub = Subscription('./src/data/subscription.json')
 # new_sub.input_name()
 # new_sub.category_list(mode='add')
 # new_sub.add_subscription()
@@ -292,6 +292,6 @@ class Subscription():
 
 # new_sub.update_subscription()
 # new_sub.select_subscription('Utility')
-# new_sub.delete_subscription()
+new_sub.delete_subscription()
 # print(new_sub.is_empty())
 # new_sub.cost()

@@ -1,11 +1,20 @@
 import pytest
-from subscription_handling import Subscription
 from datetime import datetime
+import sys
+import os
 
-filepath = './src/data/subscription.json'
+## add subscription_handling into pythonpath it can be imported
+current = os.path.dirname(os.path.realpath(__file__))
+parent = os.path.dirname(current)
+sys.path.append(parent)
+
+from subscription_handling import Subscription
+
+filepath = '../data/subscription.json'
 existing_subscriptions = Subscription(filepath)
 
-# this test is designed to test the whole structure and data validations of the JSON file, to ensure all data are in correct formats.
+# this test is designed to test the whole structure and data validations of the JSON file, to ensure all data are in correct formats, 
+# therefore testing the input/update feature to make sure they are writing correct data into the database
 def test_json_file_validation():
     # test whether the structure of the fila data is like: {[{},{}]}
     assert type(existing_subscriptions.file_data) is dict
@@ -44,7 +53,7 @@ def test_json_file_validation():
         for frequency in frequency_list:
             assert frequency in existing_subscriptions.frequency_option
 
-        # test all dates in the 'First bill date' fields are in valid date formats
+        # test all dates in the 'First bill date' fields are in valid date format: yyyy-mm-dd
         for date in date_list:
             try:
                 date_converted = datetime.strptime(date, '%Y-%m-%d').date()
