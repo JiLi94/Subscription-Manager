@@ -4,8 +4,10 @@ from getkey import getkey, key
 filepath = './src/data/subscription.json'
 subscription = Subscription(filepath)
 
+
 def dash_line():
     print('-'*100)
+
 
 while True:
     dash_line()
@@ -29,7 +31,7 @@ while True:
             break
 
     dash_line()
-    print('Press ENTER to go back to the main menu, or press anything else to exit the program')
+    print('Press ENTER to go back to the main menu, or press anything else to exit the application')
     user_input = getkey()
 
     if user_input == key.ENTER:
