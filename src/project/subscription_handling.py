@@ -11,7 +11,7 @@ class Subscription():
         self.frequency_option = ["Daily", "Monthly", "Quarterly", "Annual"]
         self.default_category = ['Entertainment', 'Productivity', 'Utility']
         self.file_data = read_json(self.filepath)
-        self.main_menu = ['View existing subscriptions', 'Update existing subscriptions',
+        self.main_menu = ['View existing subscriptions', 'Add new subscription', 'Update existing subscriptions',
                           'Delete existing subscriptions', 'Calculate my cost', 'Exit']
 
     def is_empty(self):
@@ -174,7 +174,7 @@ class Subscription():
             'First bill date': first_bill_date
         }
 
-        print(new_subscription)
+        print_json(new_subscription, 4)
         # add new subscription to the list using the function write_json
         write_json(category_selected, new_subscription, self.filepath)
         return [category_selected, new_subscription]
@@ -186,19 +186,14 @@ class Subscription():
             # ask user to select a category and subscription first
             category_selected = self.select_category(mode='update')
             subscription_selected = self.select_subscription(category_selected)
-            confirmation = input(
-                f'Are you sure to delete {subscription_selected}? Input Yes/No to confirm: ')
-            while True:
-                if confirmation.lower() == 'yes':
-                    delete_json(category_selected,
-                                subscription_selected, self.filepath)
-                    print('Deleted successfully!')
-                    break
-                elif confirmation.lower() == 'no':
-                    break
-                else:
-                    confirmation = input(
-                        'Please enter "Yes" or "No" to confirm: ')
+            prompt = (f'Are you sure to delete {subscription_selected}?')
+            # confirmation before deleting
+            confirmation_selected = terminal_menu(['Yes', 'No'], prompt)
+
+            if confirmation_selected == 'Yes':
+                delete_json(category_selected,
+                            subscription_selected, self.filepath)
+                print('Deleted successfully!')
 
     def update_subscription(self):
         if self.is_empty():
@@ -290,17 +285,3 @@ class Subscription():
         # print results
         print(
             f'Based on your subscriptions, your estimated {frequency_selected.lower()} cost is ${round(cost_dict[frequency_selected],2)}')
-
-
-# new_sub = Subscription('./src/data/subscription.json')
-# new_sub.input_name()
-# new_sub.category_list(mode='add')
-# new_sub.add_subscription()
-# new_sub.view_subscription()
-
-# new_sub.update_subscription()
-# new_sub.select_subscription('Utility')
-# new_sub.delete_subscription()
-# print(new_sub.is_empty())
-# new_sub.cost()
-# print(new_sub.view_main_menu())

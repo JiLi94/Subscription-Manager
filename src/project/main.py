@@ -17,6 +17,9 @@ while True:
         case 'View existing subscriptions':
             dash_line()
             subscription.view_subscription()
+        case 'Add new subscription':
+            dash_line()
+            subscription.add_subscription()
         case 'Update existing subscriptions':
             dash_line()
             subscription.update_subscription()
