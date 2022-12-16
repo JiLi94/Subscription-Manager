@@ -1,12 +1,12 @@
 from subscription_handling import Subscription
 from getkey import getkey, key
 
-filepath = './src/data/subscription.json'
+filepath = './data/subscription.json'
 subscription = Subscription(filepath)
 
 
 def dash_line():
-    print('-'*100)
+    print('-'*80)
 
 
 while True:

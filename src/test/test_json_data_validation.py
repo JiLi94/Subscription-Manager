@@ -3,10 +3,8 @@ from datetime import datetime
 import sys
 import os
 
-## add subscription_handling into pythonpath it can be imported
-current = os.path.dirname(os.path.realpath(__file__))
-parent = os.path.dirname(current)
-sys.path.append(parent)
+## add subscription_handling into pythonpath so it can be imported
+sys.path.append(os.path.abspath('../project'))
 
 from subscription_handling import Subscription
 

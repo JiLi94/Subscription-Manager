@@ -1,4 +1,4 @@
-from json_handling import read_json, print_json, write_json, delete_json
+from json_handling import *
 from terminal_menu import terminal_menu
 from datetime import datetime
 import json
@@ -19,7 +19,7 @@ class Subscription():
             return True
         else:
             return False
-    
+
     def view_main_menu(self):
         prompt = 'Welcome to your subscription manager, please select one option from the menu'
         return terminal_menu(self.main_menu, prompt)
