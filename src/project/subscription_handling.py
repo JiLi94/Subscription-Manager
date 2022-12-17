@@ -177,6 +177,7 @@ class Subscription():
         print_json(new_subscription, 4)
         # add new subscription to the list using the function write_json
         write_json(category_selected, new_subscription, self.filepath)
+        self.file_data = read_json(self.filepath)
         return [category_selected, new_subscription]
 
     def delete_subscription(self):
@@ -194,6 +195,8 @@ class Subscription():
                 delete_json(category_selected,
                             subscription_selected, self.filepath)
                 print('Deleted successfully!')
+
+            self.file_data = read_json(self.filepath)
 
     def update_subscription(self):
         if self.is_empty():
@@ -244,39 +247,43 @@ class Subscription():
             # write the updated subscription into database
             write_json(category_selected_updated,
                        subscription_selected_updated, self.filepath)
+            self.file_data = read_json(self.filepath)          
             # print the updated record
             print_json(subscription_selected_updated, 4)
 
     def cost(self):
-        frequency_selected = self.select_frequency()
+        if self.is_empty():
+            print('You don\'t have any existing subscriptions')
+        else:
+            frequency_selected = self.select_frequency()
 
-        # file_data = read_json(self.filepath)
-        # calculate total cost of each frequency
-        cost_dict = {}
-        for frequency in self.frequency_option:
-            cost = 0
-            for category in self.file_data:
-                for sub in self.file_data[category]:
-                    # print(sub)
-                    if sub['Frequency'] == frequency:
-                        cost += sub['Charge']
-            cost_dict[frequency] = cost
+            # file_data = read_json(self.filepath)
+            # calculate total cost of each frequency
+            cost_dict = {}
+            for frequency in self.frequency_option:
+                cost = 0
+                for category in self.file_data:
+                    for sub in self.file_data[category]:
+                        # print(sub)
+                        if sub['Frequency'] == frequency:
+                            cost += sub['Charge']
+                cost_dict[frequency] = cost
 
-        # calculate the estimated cost for each frequency
-        cost_daily = cost_dict['Daily'] + cost_dict['Monthly'] * 12 / \
-            365 + cost_dict['Quarterly'] * 4 / 365 + cost_dict['Annual'] / 365
-        cost_monthly = cost_dict['Daily'] * 365 / 12 + cost_dict['Monthly'] + \
-            cost_dict['Quarterly'] / 3 + cost_dict['Annual'] / 12
-        cost_quarterly = cost_dict['Daily'] * 365 / 4 + cost_dict['Monthly'] * \
-            3 + cost_dict['Quarterly'] + cost_dict['Annual'] / 4
-        cost_annual = cost_dict['Daily'] * 365 + cost_dict['Monthly'] * \
-            12 + cost_dict['Quarterly'] * 4 + cost_dict['Annual']
+            # calculate the estimated cost for each frequency
+            cost_daily = cost_dict['Daily'] + cost_dict['Monthly'] * 12 / \
+                365 + cost_dict['Quarterly'] * 4 / 365 + cost_dict['Annual'] / 365
+            cost_monthly = cost_dict['Daily'] * 365 / 12 + cost_dict['Monthly'] + \
+                cost_dict['Quarterly'] / 3 + cost_dict['Annual'] / 12
+            cost_quarterly = cost_dict['Daily'] * 365 / 4 + cost_dict['Monthly'] * \
+                3 + cost_dict['Quarterly'] + cost_dict['Annual'] / 4
+            cost_annual = cost_dict['Daily'] * 365 + cost_dict['Monthly'] * \
+                12 + cost_dict['Quarterly'] * 4 + cost_dict['Annual']
 
-        cost_dict['Daily'] = cost_daily
-        cost_dict['Monthly'] = cost_monthly
-        cost_dict['Quarterly'] = cost_quarterly
-        cost_dict['Annual'] = cost_annual
+            cost_dict['Daily'] = cost_daily
+            cost_dict['Monthly'] = cost_monthly
+            cost_dict['Quarterly'] = cost_quarterly
+            cost_dict['Annual'] = cost_annual
 
-        # print results
-        print(
-            f'Based on your subscriptions, your estimated {frequency_selected.lower()} cost is ${round(cost_dict[frequency_selected],2)}')
+            # print results
+            print(
+                f'Based on your subscriptions, your estimated {frequency_selected.lower()} cost is ${round(cost_dict[frequency_selected],2)}')
