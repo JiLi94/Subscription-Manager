@@ -1,13 +1,12 @@
 from subscription_handling import Subscription
 from getkey import getkey, key
 
+
 filepath = './data/subscription.json'
 subscription = Subscription(filepath)
 
-
 def dash_line():
     print('-'*80)
-
 
 while True:
     dash_line()

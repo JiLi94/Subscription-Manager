@@ -7,10 +7,8 @@ def read_json(filepath):
 
     return file_data
 
-
 def print_json(file_data, indent):
     print(json.dumps(file_data, indent = indent))
-
 
 def write_json(category, subscription, filepath):
     file_data = read_json(filepath)
@@ -29,7 +27,6 @@ def write_json(category, subscription, filepath):
         json.dump(file_data, file)
 
     print('Updated Successfully!')
-
 
 def delete_json(category, subscription, filepath):
     file_data = read_json(filepath)

@@ -1,5 +1,6 @@
 from simple_term_menu import TerminalMenu
 
+
 def terminal_menu(options, prompt):
     print(prompt)
     while True:

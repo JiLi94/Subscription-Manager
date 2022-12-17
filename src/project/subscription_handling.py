@@ -224,20 +224,15 @@ class Subscription():
                 # update the subscription based on user's selection
                 match selected_attribute:
                     case 'Category':
-                        category_selected_updated = self.select_category(
-                            mode='add')
+                        category_selected_updated = self.select_category(mode='add')
                     case 'Name':
-                        subscription_selected_updated['Name'] = self.input_name(
-                        )
+                        subscription_selected_updated['Name'] = self.input_name()
                     case 'Frequency':
-                        subscription_selected_updated['Frequency'] = self.select_frequency(
-                        )
+                        subscription_selected_updated['Frequency'] = self.select_frequency()
                     case 'Charge':
-                        subscription_selected_updated['Charge'] = self.input_charge(
-                        )
+                        subscription_selected_updated['Charge'] = self.input_charge()
                     case 'First bill date':
-                        subscription_selected_updated['First bill date'] = self.input_date(
-                        )
+                        subscription_selected_updated['First bill date'] = self.input_date()
 
                 # user finishes updating
                 if selected_attribute == 'Done':
